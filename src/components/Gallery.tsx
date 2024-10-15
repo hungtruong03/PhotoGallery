@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './Gallery.css';
-import { Photo } from '../interfaces/photo';
+import '../styles/Gallery.css';
+import { Photo } from '../interfaces/Photo';
+import PhotoFooter from './PhotoFooter';
 
 const Gallery = () => {
     const [photos, setPhotos] = useState<Photo[]>([]);
@@ -37,15 +38,16 @@ const Gallery = () => {
             );
 
             if (newPhotos.length === 0) {
-                setHasMore(false); //Không còn hình mới
+                setHasMore(false);
             } else {
                 setPhotos(prevPhotos => [...prevPhotos, ...newPhotos]); //Vẫn còn hình mới
             }
         } catch (error) {
             console.log('Error fetching photos:', error);
-            setHasMore(false); //Fetch lỗi thì có thể là đã hết 50 call/1 tiếng hoặc api key sai
+            setHasMore(false); //Fetch lỗi thì có thể là đã hết 50 call/1 tiếng (hoặc api key sai, nhưng trường hợp này khó xảy ra)
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     useEffect(() => {
@@ -54,7 +56,7 @@ const Gallery = () => {
 
     const handleScroll = () => {
         //Kiểm tra người dùng đã kéo đến cuối trang chưa, nếu đã kéo đến cuối trang rồi và chưa load thêm thì mới tăng số trang
-        if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 1 && !loading) {
+        if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 5 && !loading && hasMore) {
             setPage(prevPage => prevPage + 1); //Tăng số trang lên
         }
     };
@@ -79,14 +81,21 @@ const Gallery = () => {
                 {photos.map((photo) => (
                     <div key={photo.id} className="photo-item" onClick={() => handleClick(photo.id)}>
                         <img src={photo.urls.small} alt={photo.alt_description} />
-                        <p>By {photo.user.name}</p>
+                        <PhotoFooter
+                            username={photo.user.username}
+                            avatarUrl={photo.user.profile_image.large}
+                            likes={photo.likes}
+                        />
                     </div>
                 ))}
 
             </div>
             <div>
-                {hasMore && loading && <div className="loading-spinner">Loading...</div>}
-                {!hasMore && <div className="end-message">No more images to load.</div>}
+                {loading ? (
+                    <div className="loading-spinner">Loading...</div>
+                ) : (
+                    !hasMore && <div className="end-message">No more images to load.</div>
+                )}
             </div>
         </>
     );

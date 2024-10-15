@@ -9,6 +9,10 @@ export interface Photo {
     likes: number;
     user: {
         id: string;
+        username: string;
         name: string;
+        profile_image: {
+            large: string;
+        };
     };
 }

@@ -1,9 +1,11 @@
 import { useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import './Detail.css';
-import { Photo } from '../interfaces/photo';
+import '../styles/Detail.css';
+import { Photo } from '../interfaces/Photo';
 import BackButton from './BackButton';
+import Loading from './Loading';
+import PhotoInfo from './PhotoInfo';
 
 const Detail = () => {
     const [searchParams] = useSearchParams(); //Lấy id từ search params
@@ -68,30 +70,28 @@ const Detail = () => {
         }
     }, [id]);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <Loading />;
 
     return (
         <>
             {error ? (
-                <div className="error-message">
-                    <p>{error}</p>
-                    <BackButton />
+                <div className="error-container">
+                    <div className="error-message">
+                        <p>{error}</p>
+                        <BackButton />
+                    </div>
                 </div>
             ) : (
                 <>
                     {photo ? (
                         <div className="photo-detail">
                             <img src={photo.urls.full} alt={photo.alt_description} />
-                            <div className="photo-info">
-                                <div className="category-title">Title</div>
-                                <p>{photo.description || "No Title"}</p> {/*Description có thể null*/}
-                                <div className="category-title">Description</div>
-                                <p>{photo.alt_description}</p>
-                                <div className="category-title">Author</div>
-                                <p>{photo.user.name}</p>
-                                <p className="likes">&#10084; {photo.likes || 0}</p>
-                                <BackButton />
-                            </div>
+                            <PhotoInfo
+                                    title={photo.description}
+                                    description={photo.alt_description}
+                                    author={photo.user.name}
+                                    likes={photo.likes}
+                            />
                         </div>
                     ) : (
                         <p>Loading...</p>
