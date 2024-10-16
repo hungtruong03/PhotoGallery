@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Gallery.css';
 import { Photo } from '../interfaces/Photo';
-import PhotoFooter from './PhotoFooter';
+import PhotoItem from './PhotoItem';
 
 const Gallery = () => {
     const [photos, setPhotos] = useState<Photo[]>([]);
@@ -79,16 +79,17 @@ const Gallery = () => {
             </div>
             <div className="photo-gallery">
                 {photos.map((photo) => (
-                    <div key={photo.id} className="photo-item" onClick={() => handleClick(photo.id)}>
-                        <img src={photo.urls.small} alt={photo.alt_description} />
-                        <PhotoFooter
-                            username={photo.user.username}
-                            avatarUrl={photo.user.profile_image.large}
-                            likes={photo.likes}
-                        />
-                    </div>
+                    <PhotoItem
+                        key={photo.id}
+                        id={photo.id}
+                        imageUrl={photo.urls.small}
+                        altDescription={photo.alt_description}
+                        username={photo.user.username}
+                        avatarUrl={photo.user.profile_image.large}
+                        likes={photo.likes}
+                        onClick={handleClick}
+                    />
                 ))}
-
             </div>
             <div>
                 {loading ? (
